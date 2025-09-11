@@ -10,7 +10,7 @@ const Sidebar = ({isMenuOpen, setIsMenuOpen}) => {
 
   return (
     <div
-      className={`flex flex-col h-screen min-w-72 p-5 dark:bg-gradient-to-b from-[#242124]/30 to-[#000000]/30 border-r border-[#80609F]/30
+      className={`flex  flex-col h-screen min-w-72 p-5 dark:bg-gradient-to-b from-[#242124]/30 to-[#000000]/30 border-r border-[#80609F]/30
      backdrop-blur-3xl transition-all duration-500 max-md-absolute left-0 z-1 ${!isMenuOpen && 'max-md:-translate-x-full'}`}
     >
       {/* logo */}
@@ -46,6 +46,7 @@ const Sidebar = ({isMenuOpen, setIsMenuOpen}) => {
           placeholder="Search Conversation"
           onChange={(e) => setSearch(e.target.value)}
           value={search}
+          className="outline-none"
         />
       </div>
 
@@ -63,7 +64,7 @@ const Sidebar = ({isMenuOpen, setIsMenuOpen}) => {
               : chat.name.toLowerCase().includes(search.toLowerCase())
           )
           .map((chat) => (
-            <div   key={chat._id}  onClick={()=>{navigate('/'); setSelectedChat(chat); setIsMenuOpen(false) }} className="border p-2 rounded-md border-gray-400 flex justify-between items-center group hover:scale-99 transition-all delay-75">
+            <div   key={chat._id}  onClick={()=>{navigate('/'); setSelectedChat(chat); setIsMenuOpen(false) }} className="border p-2 rounded-md  flex justify-between items-center group hover:scale-99 transition-all delay-75  border-gray-400  dark:border-white/20">
               <div className="flex flex-col ">
                 <p className="w-full truncate">
                   {chat.messages.length > 0

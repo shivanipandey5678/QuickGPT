@@ -9,7 +9,8 @@ export const AppContextProvider = ({children}) => {
     const [user,setUser] = useState(null);
     const [ chats ,setChats] = useState([]);
     const [selectedChat,setSelectedChat] = useState(null);
-    const [theme,setTheme] = useState(localStorage.getItem('theme')|| 'light')
+    const [theme,setTheme] = useState(localStorage.getItem('theme')|| 'light');
+    const currancy = '$';
 
     const fetchUser = async() => {
         setUser(dummyUserData)
@@ -43,7 +44,7 @@ export const AppContextProvider = ({children}) => {
     useEffect(()=> {
         fetchUser()
     },[])
-    const value = {navigate ,user, setUser ,chats,setChats ,selectedChat,setSelectedChat ,theme,setTheme ,fetchUser}
+    const value = {navigate ,user, setUser ,chats,setChats ,selectedChat,setSelectedChat ,theme,setTheme ,fetchUser,currancy}
     return(
         <AppContext.Provider value={value}>
             {children}
