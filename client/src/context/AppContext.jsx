@@ -13,7 +13,7 @@ export const AppContextProvider = ({children}) => {
     const currancy = '$';
 
     const fetchUser = async() => {
-        setUser(dummyUserData)
+        setUser()
     }
 
     const fetchUsersChats = async() => {
