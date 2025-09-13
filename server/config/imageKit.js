@@ -1,10 +1,7 @@
 import ImageKit from "imagekit";
 
 
-function hi(){
-    console.log(process.env.IMAGEKIT_PUBLIC_KEY,"🏡🏡❌❌❌❌❌❌ at imagekit.js")
-}
-hi()
+
 
 const imagekit = new ImageKit({
   publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
