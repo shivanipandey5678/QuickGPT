@@ -38,7 +38,7 @@ const App = () => {
         </div>
         ) : 
         (
-          <div className='flex   h-full w-full'>
+          <div className='flex  h-full w-full'>
           
           <Routes>
              
