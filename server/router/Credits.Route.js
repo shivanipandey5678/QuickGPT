@@ -1,7 +1,7 @@
 
 import express from 'express';
 import { authMiddleware } from '../middleware/Auth.js';
-import { getPlans, purchasePlans } from '../controllers/creadit.Controller.js';
+import { getPlans, purchasePlans } from '../controllers/Creadit.Controller.js'
 
 const creditRouter = express.Router();
 
