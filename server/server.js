@@ -1,4 +1,4 @@
-import "dotenv/config";   // .env ko auto load kar lega
+import "dotenv/config";  
 
 import express from 'express';
 import cors from 'cors';
@@ -25,8 +25,8 @@ await connectDB();
 app.post('/api/stripe',express.raw({type:'application/json'}),stripeWebhooks)
 
 //routes
-app.use('/api',UserRouter)
-app.use('/api',ChatRouter)
+app.use('/api/user',UserRouter)
+app.use('/api/chat',ChatRouter)
 app.use('/api/message',messageRouter)
 app.use('/api/credits',creditRouter)
 

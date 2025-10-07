@@ -1,10 +1,11 @@
 //text based ai chat message
-
 import Chat from "../models/Chat.Model.js";
 import User from "../models/User.js";
 import axios from 'axios';
 import imagekit from "../config/imageKit.js";
 import { openai } from "../config/openai.js";
+
+
 
 export const textMessageController = async (req, res) => {
   try {
@@ -12,7 +13,7 @@ export const textMessageController = async (req, res) => {
       if (req.user.credit < 1) {
           return res.json({
             success: false,
-            message: "You don't have enough credits to use this feture",
+            message: "You don't have enough credits to use this feature",
           });
         }
     const { chatId, prompt } = req.body;
@@ -32,7 +33,7 @@ export const textMessageController = async (req, res) => {
     const reply = {
       ...choices[0].message,
       timestamp: Date.now(),
-      isImage: false,
+      
     };
     chat.message.push(reply);
     await chat.save();
@@ -47,6 +48,8 @@ export const textMessageController = async (req, res) => {
   }
 };
 
+
+
 //image generation messages
 export const imageMessageController = async (req, res) => {
   try {
@@ -54,10 +57,10 @@ export const imageMessageController = async (req, res) => {
     if (req.user.credit < 2) {
       return res.json({
         success: false,
-        message: "You don't have enough credits to use this feture",
+        message: "You don't have enough credits to use this feature",
       });
     }
-
+ 
     const { prompt, chatId, isPublished } = req.body;
     const chat = await Chat.findOne({ _id: chatId, userId });
     chat.message.push({ role: "user", content: prompt, timestamp: Date.now() });
@@ -80,7 +83,7 @@ export const imageMessageController = async (req, res) => {
 
     const reply = {
         role:'assistant',
-        constent:uploadResponse.url,
+        content:uploadResponse.url,
         timestamp: Date.now(),
         isImage: true,
         isPublished

@@ -22,8 +22,9 @@ const plans = [ {
     features: ['1000 text generations', '500 image generations', '24/7 VIP support', 'Access to premium models', 'Dedicated account manager']
 }];
 
+
 //api controller for getting all plans
-export const getPlans = async(req,res) =>{
+export const getPlans = async(req,res) => {
     try {
         res.json({success:true, plans})
     } catch (error) {

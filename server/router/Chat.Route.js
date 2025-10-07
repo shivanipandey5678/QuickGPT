@@ -3,8 +3,8 @@ import express from 'express';
 const ChatRouter = express.Router();
 import { authMiddleware } from '../middleware/Auth.js';
 
-ChatRouter.get('/new-chat',authMiddleware,createChat);
-ChatRouter.post('/delete-chat',authMiddleware ,deleteChat);
+ChatRouter.get('/new',authMiddleware,createChat);
+ChatRouter.post('/delete',authMiddleware ,deleteChat);
 ChatRouter.get('/all-chats',authMiddleware,getAllChats);
 
 export default ChatRouter

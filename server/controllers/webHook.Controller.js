@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 import Transaction from "../models/Transaction.js";
-import User from "../models/User.js"; // make sure you have this
+import User from "../models/User.js";
 
 export const stripeWebhooks = async (req, res) => {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -49,6 +49,7 @@ export const stripeWebhooks = async (req, res) => {
             // Update payment status
             transaction.isPaid = true;
             await transaction.save();
+            console.log('Credits updated for user:', transaction.userId);
           }
         } else {
           return res.json({
