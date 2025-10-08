@@ -17,21 +17,32 @@ const Chatbox = () => {
 
   useEffect(() => {
     if (selectedChat) {
-      setMessages(selectedChat.message );
-      console.log("💃💃💃",messages)
-    }else{
-      console.log("⏳")
+      setMessages(selectedChat.message);
+    } else {
+      setMessages([]);
     }
-    console.log(selectedChat, "selectedChat 🏡🏡🏡🥲🏡🏡🏡🏡🏡");
   }, [selectedChat]);
 
   const onSubmit = async (e) => {
     try {
       e.preventDefault();
-      if (!user) return toast("Login to send message");
+      if (!user) return toast("Please login to send a message.");
+      if (mode === "image" && user.credit < 2) {
+        toast.error(
+          "You need at least 2 credits to generate an image. Buy more credits to continue."
+        );
+        return;
+      }
+      if (mode === "text" && user.credit < 1) {
+        toast.error(
+          "You need at least 1 credit to send a text message. Buy more credits to continue."
+        );
+        return;
+      }
       setLoading(true);
       const promptCopy = prompt;
       setPrompt("");
+
       setMessages((prev) => [
         ...prev,
         {
@@ -50,16 +61,16 @@ const Chatbox = () => {
       if (data.success) {
         setMessages((prev) => [...prev, data.reply]);
         if (mode === "image") {
-          setUser((prev) => ({ ...prev, credits: prev.credits - 2 }));
+          setUser((prev) => ({ ...prev, credit: prev.credit - 2 }));
         } else {
-          setUser((prev) => ({ ...prev, credits: prev.credits - 1 }));
+          setUser((prev) => ({ ...prev, credit: prev.credit - 1 }));
         }
       } else {
-        toast.error(data.message);
+        toast.error(data.message, " catch onSubmit chatbox");
         setPrompt(promptCopy);
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message, " catch onSubmit chatbox");
     } finally {
       setPrompt("");
       setLoading(false);
@@ -79,7 +90,7 @@ const Chatbox = () => {
       {/* chat messages */}
 
       <div className="flex-1 mb-5 overflow-y-scroll" ref={containerRef}>
-        {console.log(messages.length,"🧠")}
+    
         {messages.length === 0 && (
           <div className="h-full flex flex-col items-center justify-center gap-2 text-primary">
             <img
@@ -106,6 +117,7 @@ const Chatbox = () => {
           </div>
         )}
       </div>
+
       {mode === "image" && (
         <label className="inline-flex items-center gap-2 mb-3 text-3 text-sm mx-auto">
           <p className="text-xs">Publish Generated Image to Community </p>
@@ -117,12 +129,14 @@ const Chatbox = () => {
           />
         </label>
       )}
+
+
       {/* prompt input box */}
       <form
         onSubmit={onSubmit}
         className="bg-primary/20 dark:bg-[#583C79]/30 border border-primary  dark:border-[#806609F]/30 rounded-full w-full max-w-2xl p-3  mx-auto flex gap-4 items-center justify-between"
       >
-        <div className="flex-1">
+        <div className="w-full flex">
           <select
             className="text-sm  outline-none mr-3"
             onChange={(e) => setMode(e.target.value)}

@@ -30,7 +30,7 @@ export const getAllChats = async(req,res)=>{
     try {
         const userId = req.user._id;
         const allChats = await Chat.find({userId}).sort({updatedAt:-1});
-        if (allChats.length === 0) return res.json({ message:"No chat found",success:true ,it:allChats});
+        if (allChats.length === 0) return res.json({ message:"No chat found",success:true ,chats:allChats});
         
         res.status(200).json({chats:allChats,success:true,message:"fetched all chats successfully"});
 

@@ -27,10 +27,10 @@ export const AppContextProvider = ({ children }) => {
       if (data.success) {
         setUser(data.user);
       } else {
-        toast.error(data.message);
+        toast.error(data.message," else fetchUser appcontext");
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message ," catch fetchUser appcontext");
     } finally {
       setLoadingUser(false);
     }
@@ -44,7 +44,7 @@ export const AppContextProvider = ({ children }) => {
       });
       await fetchUsersChats();
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message," catch createNewChat appcontext");
     }
   };
 
@@ -57,7 +57,7 @@ export const AppContextProvider = ({ children }) => {
       console.log("fetchUsersChats get at appcontext.jsx 📞📞", data);
       if (data.success) {
         setChats([...data.chats]);
-        console.log("chats ata  fetchUsersChats🟢🟢", data.chats);
+        console.log("chats ata  fetchUsersChats🟢🟢", data);
         if (data.chats.length === 0) {
           await createNewChat();
 
@@ -68,10 +68,10 @@ export const AppContextProvider = ({ children }) => {
           console.log(firstChat, "😎");
         }
       } else {
-        toast.error(data.message);
+        toast.error(data.message ," catch fetchUsersChats appcontext");
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message ," catch fetchUsersChats appcontext");
     }
   };
 
@@ -103,6 +103,7 @@ export const AppContextProvider = ({ children }) => {
     } else {
       setUser(null);
       setLoadingUser(false);
+      navigate("/")
     }
   }, []);
 

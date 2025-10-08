@@ -13,10 +13,12 @@ export const stripeWebhooks = async (req, res) => {
       process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (error) {
+    console.error("Webhook error:", error.message);
     return res.status(400).send(`Webhook error: ${error.message}`);
   }
 
   try {
+    console.log("Stripe Event:", event.type);
     switch (event.type) {
       case "payment_intent.succeeded": {
         const paymentIntent = event.data.object;
@@ -28,10 +30,12 @@ export const stripeWebhooks = async (req, res) => {
 
         const session = sessionList.data[0];
         if (!session) {
+          console.log("No session found for payment intent:", paymentIntent.id);
           return res.json({ received: true, message: "No session found" });
         }
 
         const { transactionId, appId } = session.metadata;
+        console.log("Transaction ID:", transactionId, "App ID:", appId);
 
         if (appId === "quickgpt") {
           const transaction = await Transaction.findOne({
@@ -41,17 +45,21 @@ export const stripeWebhooks = async (req, res) => {
 
           if (transaction) {
             // Update user credits
+            console.log("Transaction found:", transaction);
             await User.updateOne(
               { _id: transaction.userId },
-              { $inc: { credits: transaction.credits } }
+              { $inc: { credit: transaction.credits } }
             );
 
             // Update payment status
             transaction.isPaid = true;
             await transaction.save();
             console.log('Credits updated for user:', transaction.userId);
+          }else {
+            console.log("Transaction not found or already paid.");
           }
         } else {
+          console.log("Invalid app ID:", appId);
           return res.json({
             received: true,
             message: "Ignored event: Invalid app",

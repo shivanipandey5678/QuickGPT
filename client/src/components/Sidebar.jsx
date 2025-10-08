@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useState } from "react";
 import { useAppContext } from "../context/useContext";
 import { assets } from "../assets/assets";
 import moment from "moment";
@@ -25,7 +25,12 @@ const Sidebar = ({ isMenuOpen, setIsMenuOpen }) => {
   const logout = () => {
     localStorage.removeItem("token");
     setToken(null);
+  
     toast.success("Logged out successfully");
+
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000); 
   };
 
   const deleteChat = async (e, chatId) => {
@@ -45,10 +50,10 @@ const Sidebar = ({ isMenuOpen, setIsMenuOpen }) => {
         setLoadingChats(false);
         setChats((prev) => prev.filter((chat) => chat._id !== chatId));
         await fetchUsersChats();
-        toast.success(data.message);
+        toast.success(data.message ," catch deleteChat sidebar");
       }
     } catch (error) {
-      toast.success(error.message);
+      toast.success(error.message ," catch deleteChat sidebar");
     }
   };
 
@@ -176,7 +181,7 @@ const Sidebar = ({ isMenuOpen, setIsMenuOpen }) => {
             className="w-4 dark:invert  "
           />
           <div>
-            <p className="font-medium">Credits : 20</p>
+            <p className="font-medium">Credits : {user.credit}  </p>
             <p className="text-xs text-gray-500 dark:text-white">
               Purchase credits to use quickGPT
             </p>
@@ -216,6 +221,7 @@ const Sidebar = ({ isMenuOpen, setIsMenuOpen }) => {
             <img
               src={assets.logout_icon}
               onClick={logout}
+             
               className="hidden group-hover:block w-5 h-5  not-dark:invert md:hidden cursor-pointer"
             />
           )}
