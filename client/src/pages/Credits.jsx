@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Loading from "./loading";
+import Loading from "./Loading.jsx";
 import { useAppContext } from "../context/useContext";
 import toast from "react-hot-toast";
 
