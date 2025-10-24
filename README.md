@@ -21,8 +21,14 @@ A **Full-Stack AI Chatbot Application** built with **React.js, Node.js, Express,
 
 ## 🎨 Preview
 
-![App Preview](https://via.placeholder.com/800x400.png?text=QuickGPT+Preview)
-*Replace this placeholder with a GIF or screenshot of your app in action.*
+![Login Page](client/public/Login.png)
+![Signup Page](client/public/signup.png)
+![New Chat](client/public/newChat.png)
+![Code Generation](client/public/codeGenration.png)
+![Image Generation](client/public/imageGenration.png)
+![Community Gallery](client/public/CommunityImg.png)
+![Price/Credits Page](client/public/price.png)
+
 
 ---
 
