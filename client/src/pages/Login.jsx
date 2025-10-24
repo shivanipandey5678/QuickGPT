@@ -12,7 +12,7 @@ const Login = () => {
      e.preventDefault();
      try {
         if(state==="login"){
-            const res= await axios.post('http://localhost:8000/api/user/login',{email,password});
+            const res= await axios.post('/api/user/login',{email,password});
             console.log("API Response login:", res.data);
             if (res.data.success) {
                     toast.success(res.data.message || "Chat loggedIn successfully!");
@@ -23,7 +23,7 @@ const Login = () => {
                     toast.error("Failed to login chat!");
             }
         }else{
-            const res= await axios.post('http://localhost:8000/api/user/register',{name,email,password});
+            const res= await axios.post('/api/user/register',{name,email,password});
             console.log("API Response register:", res);
             if (res.data.success) {
                 toast.success(res.data.message || "Chat register successfully!");
