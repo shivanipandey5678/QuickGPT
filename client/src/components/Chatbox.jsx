@@ -148,12 +148,7 @@ const Chatbox = () => {
             <option value="image" className="dark:bg-purple-900">
               Image
             </option>
-            <option value="apj" className="dark:bg-purple-900">
-              apj sir persona
-            </option>
-            <option value="hiteshPersona" className="dark:bg-purple-900">
-              Persona of hitesh chodhary
-            </option>
+          
           </select>
           <input
             type="text"
