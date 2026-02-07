@@ -23,12 +23,16 @@ const App = () => {
   return (
     <>
      <Toaster />
-    {!isMenuOpen  &&  <img src={assets.menu_icon} className='absolute top-3 left-3 w-8 h-8 cursor-pointer md:hidden not-dark:invert' onClick={()=>setIsMenuOpen(true)}/>}
-      <div className='dark:bg-gradient-to-b from-[#242124] to-[#000000] dark:text-white min-h-screen w-screen '>
+    {!isMenuOpen  &&  <img src={assets.menu_icon} className='absolute top-3 left-3 w-8 h-8 cursor-pointer z-40 md:hidden not-dark:invert' onClick={()=>setIsMenuOpen(true)}/>}
+      {/* Mobile overlay when sidebar open */}
+      {user && isMenuOpen && (
+        <div className="fixed inset-0 bg-black/50 z-40 md:hidden" onClick={() => setIsMenuOpen(false)} aria-hidden="true" />
+      )}
+      <div className='dark:bg-gradient-to-b from-[#242124] to-[#000000] dark:text-white min-h-screen w-full min-w-0 overflow-x-hidden'>
 
         {user ? 
         (
-          <div className='flex   h-screen w-full'>
+          <div className='flex h-screen w-full min-w-0'>
           <Sidebar isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen}/>
           <Routes>
               <Route path='/' element={<Chatbox/>}/>

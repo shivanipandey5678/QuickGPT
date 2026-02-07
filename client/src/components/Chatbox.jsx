@@ -86,7 +86,7 @@ const Chatbox = () => {
     }
   }, [messages]);
   return (
-    <div className="flex-1 flex flex-col justify-between m-5 md:m-10 xl:mx-30 max-md:mt-14 2xl:pr-40 w-full">
+    <div className="flex-1 flex flex-col justify-between m-4 sm:m-5 md:m-10 xl:mx-16 2xl:mx-24 max-md:mt-14 2xl:pr-40 w-full min-w-0 overflow-hidden">
       {/* chat messages */}
 
       <div className="flex-1 mb-5 overflow-y-scroll" ref={containerRef}>
@@ -96,7 +96,7 @@ const Chatbox = () => {
             <img
               src={theme === "dark" ? assets.logo_full : assets.logo_full_dark}
               alt="logo_full"
-              className="w-full max-w-56 sm:max-w-68"
+              className="w-full max-w-56 sm:max-w-72"
             />
             <p className="mt-5 text-4xl sm:text-6xl text-center text-gray-400 dark:text-white ">
               Ask me anything.
@@ -134,11 +134,11 @@ const Chatbox = () => {
       {/* prompt input box */}
       <form
         onSubmit={onSubmit}
-        className="bg-primary/20 dark:bg-[#583C79]/30 border border-primary  dark:border-[#806609F]/30 rounded-full w-full max-w-2xl p-3  mx-auto flex gap-4 items-center justify-between"
+        className="bg-primary/20 dark:bg-[#583C79]/30 border border-primary dark:border-[#806609F]/30 rounded-full w-full max-w-2xl p-2 sm:p-3 mx-auto flex gap-2 sm:gap-4 items-center justify-between min-w-0"
       >
-        <div className="w-full flex">
+        <div className="w-full flex min-w-0">
           <select
-            className="text-sm  outline-none mr-3"
+            className="text-xs sm:text-sm outline-none mr-2 sm:mr-3 shrink-0"
             onChange={(e) => setMode(e.target.value)}
             value={mode}
           >
@@ -155,7 +155,7 @@ const Chatbox = () => {
             placeholder="Type your prompt here ..."
             onChange={(e) => setPrompt(e.target.value)}
             value={prompt}
-            className="outline-none flex-1"
+            className="outline-none flex-1 min-w-0"
           />
         </div>
         <button

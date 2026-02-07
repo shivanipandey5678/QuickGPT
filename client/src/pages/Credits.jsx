@@ -46,15 +46,15 @@ const Credits = () => {
 
   if (loading) return <Loading />;
   return (
-    <div className="w-full">
-      <h1 className="text-3xl font-bold text-center mb-3 mt-10 ">Credits</h1>
-      <div className="flex flex-wrap justify-center gap-4 p-3 mt-10 ">
+    <div className="w-full min-w-0 px-4 sm:px-6 overflow-x-hidden">
+      <h1 className="text-2xl sm:text-3xl font-bold text-center mb-3 mt-6 sm:mt-10">Credits</h1>
+      <div className="flex flex-wrap justify-center gap-4 p-3 sm:p-4 mt-6 sm:mt-10">
         {plans &&
           plans.map((plan, i) => (
             <div
               key={i}
               className={
-                `border p-5 flex flex-col justify-between rounded-md h-[330px] w-[300px]  ` +
+                `border p-4 sm:p-5 flex flex-col justify-between rounded-md min-h-[300px] sm:h-[330px] w-full max-w-[300px] min-w-0 ` +
                 (i % 2 === 0
                   ? "border-[#A0522D]"
                   : "dark:bg-[#980ffa]/40  border-white/20  bg-[#99a1b0]/30")

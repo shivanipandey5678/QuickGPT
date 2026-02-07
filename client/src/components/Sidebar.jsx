@@ -59,9 +59,9 @@ const Sidebar = ({ isMenuOpen, setIsMenuOpen }) => {
 
   return (
     <div
-      className={`flex  flex-col h-screen min-w-72 p-5 dark:bg-gradient-to-b from-[#242124]/30 to-[#000000]/30 border-r border-[#80609F]/30
-     backdrop-blur-3xl transition-all duration-500 max-md-absolute left-0 z-1 ${
-       !isMenuOpen && "max-md:-translate-x-full"
+      className={`flex flex-col h-screen w-72 max-w-[85vw] max-md:w-[85vw] min-w-0 p-5 dark:bg-gradient-to-b from-[#242124]/30 to-[#000000]/30 border-r border-[#80609F]/30
+     backdrop-blur-3xl transition-all duration-500 max-md:absolute max-md:left-0 max-md:top-0 max-md:z-50 ${
+       !isMenuOpen ? "max-md:-translate-x-full" : ""
      }`}
     >
       {/* logo */}
@@ -74,7 +74,7 @@ const Sidebar = ({ isMenuOpen, setIsMenuOpen }) => {
       <img
         src={assets.close_icon}
         alt="close_icon"
-        className="absolute right-4 top-6 w-4 cursor-pointer hover:scale-110 transition-all delay-75 not-dark:invert  min-md:hidden"
+        className="absolute right-4 top-6 w-4 cursor-pointer hover:scale-110 transition-all delay-75 not-dark:invert md:hidden"
         onClick={() => setIsMenuOpen(false)}
       />
 

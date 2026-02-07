@@ -45,8 +45,8 @@ const Login = () => {
 
   
   return (
-    <div className='flex justify-center items-center w-full h-screen'>
-        <form onSubmit={submitHandler} className="flex flex-col gap-4 m-auto items-start p-8 py-12 w-80 sm:w-[352px] text-gray-500 rounded-lg shadow-xl border border-gray-200 bg-white">
+    <div className='flex justify-center items-center w-full min-h-screen px-4 py-6'>
+        <form onSubmit={submitHandler} className="flex flex-col gap-4 m-auto items-start p-6 sm:p-8 py-10 sm:py-12 w-full max-w-[352px] text-gray-500 rounded-lg shadow-xl border border-gray-200 bg-white">
             <p className="text-2xl font-medium m-auto">
                 <span className="text-purple-700">User</span> {state === "login" ? "Login" : "Sign Up"}
             </p>
