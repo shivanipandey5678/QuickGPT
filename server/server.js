@@ -10,11 +10,28 @@ import creditRouter from "./router/Credits.Route.js";
 import { stripeWebhooks } from "./controllers/webHook.Controller.js";
 import path from 'path';
 
-const app= express();
+const app = express();
 
-//build in middlewares
-app.use(express.json())
-app.use(cors())
+// CORS: allow frontend origin and required headers (fixes OPTIONS + POST body on Vercel)
+const allowedOrigins = [
+  'https://quick-gpt-frontend-xi.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:3000',
+  /\.vercel\.app$/
+];
+app.use(cors({
+  origin: (origin, cb) => {
+    if (!origin) return cb(null, true); // same-origin or Postman
+    if (allowedOrigins.some(o => typeof o === 'string' ? o === origin : o.test(origin))) return cb(null, true);
+    return cb(null, false);
+  },
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+}));
+
+// Body parsing – must be before routes; increase limit for long prompts
+app.use(express.json({ limit: '2mb' }));
 app.use(express.static(path.join(process.cwd(), 'client/public')));
 
 
@@ -45,6 +62,10 @@ app.get('/favicon.ico', (req, res) => {
   });
   
 
-app.listen(8000,()=>{
-    console.log('Server is live')
-})
+// Local server (Vercel uses the exported app)
+const PORT = process.env.PORT || 8000;
+if (process.env.NODE_ENV !== 'production' || process.env.VERCEL !== '1') {
+  app.listen(PORT, () => console.log('Server is live on', PORT));
+}
+
+export default app;

@@ -23,7 +23,7 @@ export const register = async (req, res) => {
         expiresIn: '1d',
       });
       
-      res.status(201).json({ user: { name: newUser.name, email: newUser.email, credit: newUser.credit }, token ,success:true});
+      res.status(201).json({ user: { _id: newUser._id, name: newUser.name, email: newUser.email, credit: newUser.credit }, token, success: true });
     } catch (error) {
       res.status(500).json({ message: "Something went wrong in register", error: error.message ,success:false});
     }
@@ -53,12 +53,13 @@ export const login = async (req, res) => {
     // User info aur token bhejo response me
     res.status(200).json({ 
       user: { 
+        _id: user._id,
         name: user.name, 
         email: user.email, 
         credit: user.credit 
       }, 
-      token ,
-      success:true
+      token,
+      success: true
     });
   } catch (error) {
     res.status(500).json({ message: "Something went wrong in login ", error: error.message });

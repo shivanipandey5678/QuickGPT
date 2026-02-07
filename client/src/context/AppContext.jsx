@@ -103,9 +103,9 @@ export const AppContextProvider = ({ children }) => {
     } else {
       setUser(null);
       setLoadingUser(false);
-      navigate("/")
+      navigate("/");
     }
-  }, []);
+  }, [token]);
 
   const value = {
     navigate,

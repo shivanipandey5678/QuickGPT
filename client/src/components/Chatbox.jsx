@@ -13,7 +13,13 @@ const Chatbox = () => {
   const [loading, setLoading] = useState(false);
   const [prompt, setPrompt] = useState("");
   const [mode, setMode] = useState("text");
+  const [persona, setPersona] = useState("hitesh"); // "hitesh" | "osm"
   const [isPublished, setIsPublished] = useState(false);
+
+  const personaOptions = [
+    { value: "hitesh", label: "Chat with Hitesh Sir" },
+    { value: "osm", label: "Chat with OSM" },
+  ];
 
   useEffect(() => {
     if (selectedChat) {
@@ -27,6 +33,7 @@ const Chatbox = () => {
     try {
       e.preventDefault();
       if (!user) return toast("Please login to send a message.");
+      if (!selectedChat?._id) return toast("Please wait, loading chat...");
       if (mode === "image" && user.credit < 2) {
         toast.error(
           "You need at least 2 credits to generate an image. Buy more credits to continue."
@@ -55,8 +62,13 @@ const Chatbox = () => {
 
       const { data } = await axios.post(
         `/api/message/${mode}`,
-        { chatId: selectedChat._id, prompt, isPublished },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { chatId: selectedChat._id, prompt, isPublished, persona },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       if (data.success) {
         setMessages((prev) => [...prev, data.reply]);
@@ -130,25 +142,36 @@ const Chatbox = () => {
         </label>
       )}
 
+      {/* Selected persona – visible as soon as user selects */}
+      <p className="text-center text-sm text-gray-500 dark:text-purple-200/80 mb-1">
+        {persona === "hitesh" ? "Chat with Hitesh Sir" : "Chat with OSM"}
+      </p>
 
       {/* prompt input box */}
       <form
         onSubmit={onSubmit}
-        className="bg-primary/20 dark:bg-[#583C79]/30 border border-primary dark:border-[#806609F]/30 rounded-full w-full max-w-2xl p-2 sm:p-3 mx-auto flex gap-2 sm:gap-4 items-center justify-between min-w-0"
+        className="bg-primary/20 dark:bg-[#583C79]/30 border border-primary dark:border-[#806609F]/30 rounded-full w-full max-w-2xl p-2 sm:p-3 mx-auto flex flex-col sm:flex-row gap-2 sm:gap-3 items-stretch sm:items-center justify-between min-w-0"
       >
-        <div className="w-full flex min-w-0">
+        <div className="w-full flex flex-wrap gap-2 sm:gap-3 min-w-0 items-center">
           <select
-            className="text-xs sm:text-sm outline-none mr-2 sm:mr-3 shrink-0"
+            className="text-xs sm:text-sm outline-none rounded-lg px-2 py-1.5 border border-primary/50 dark:border-white/20 bg-white/50 dark:bg-white/10 shrink-0"
+            onChange={(e) => setPersona(e.target.value)}
+            value={persona}
+            title="Choose who to chat with"
+          >
+            {personaOptions.map((opt) => (
+              <option key={opt.value} value={opt.value} className="dark:bg-purple-900">
+                {opt.label}
+              </option>
+            ))}
+          </select>
+          <select
+            className="text-xs sm:text-sm outline-none rounded-lg px-2 py-1.5 border border-primary/50 dark:border-white/20 bg-white/50 dark:bg-white/10 shrink-0"
             onChange={(e) => setMode(e.target.value)}
             value={mode}
           >
-            <option value="text" className="dark:bg-purple-900">
-              Text
-            </option>
-            <option value="image" className="dark:bg-purple-900">
-              Image
-            </option>
-          
+            <option value="text" className="dark:bg-purple-900">Text</option>
+            <option value="image" className="dark:bg-purple-900">Image</option>
           </select>
           <input
             type="text"

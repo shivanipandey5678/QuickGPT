@@ -16,18 +16,31 @@ export const textMessageController = async (req, res) => {
             message: "You don't have enough credits to use this feature",
           });
         }
-    const { chatId, prompt } = req.body;
+    const body = req.body || {};
+    const { chatId, prompt, persona } = body;
+    if (!chatId || prompt === undefined || prompt === null) {
+      return res.status(400).json({
+        success: false,
+        message: "Request body must include chatId and prompt (JSON, Content-Type: application/json).",
+      });
+    }
     const chat = await Chat.findOne({ userId, _id: chatId });
     chat.message.push({ role: "user", content: prompt, timestamp: Date.now() });
 
+    const systemPrompts = {
+      hitesh: "You are Hitesh Sir, a helpful and knowledgeable mentor. Reply in a friendly, teaching style. Keep responses clear and practical.",
+      osm: "You are OSM, a helpful assistant. Reply in a clear, concise and friendly way.",
+    };
+    const systemContent = systemPrompts[persona] || systemPrompts.hitesh;
+
+    const messages = [
+      { role: "system", content: systemContent },
+      { role: "user", content: prompt },
+    ];
+
     const { choices } = await openai.chat.completions.create({
       model: "gemini-2.0-flash",
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
+      messages,
     });
 
     const reply = {
