@@ -2,20 +2,21 @@
 
 # QuickGPT 🚀
 
-A **Full-Stack AI Chatbot Application** built with **React.js, Node.js, Express, MongoDB**, powered by **OpenAI / Gemini API**. QuickGPT allows users to chat with AI, generate text & images, manage credits, and explore a community gallery — all in a sleek, responsive interface.  
+A **Full-Stack AI Chatbot Application** built with **React.js, Node.js, Express, MongoDB**, powered by **OpenAI / Gemini API**. QuickGPT lets you chat with AI (ChatGPT-style), talk to **Hitesh** or **Zakir** personas, generate images, manage credits, and explore a community gallery — all in a responsive interface.
 
 ---
 
 ## 🌟 Key Features
 
 - **User Authentication:** Sign up & log in securely  
-- **Real-time AI Chat:** Generate text responses instantly  
-- **AI Image Generation:** Create images from prompts  
-- **Credit System:** Manage usage via credits  
-- **Community Gallery:** View and share AI-generated images  
-- **Theme Toggle:** Dark/Light mode for comfort  
-- **Responsive Design:** Works seamlessly on all devices  
-- **Deployed on Vercel:** Live access without setup  
+- **4-in-1 Chat Mode:** One dropdown — **Text (ChatGPT)** | **Image** | **Hitesh** | **Zakir**
+- **Real-time AI Chat:** Text with general ChatGPT or persona-based (Hitesh Sir / Zakir)
+- **AI Image Generation:** Create images from prompts (Image mode)
+- **Credit System:** Credits for text (1) and image (2); purchase via Stripe
+- **Community Gallery:** View and share AI-generated images
+- **Theme Toggle:** Dark/Light mode
+- **Responsive Design:** Mobile and desktop friendly
+- **Deployed on Vercel:** Frontend & backend both on Vercel  
 
 ---
 
@@ -77,58 +78,61 @@ npm install
 
 3. **Configure environment variables**
 
-**Server `.env`**
+**Server `.env`** (in `server/` folder)
 
 ```env
 MONGO_URI=your_mongodb_uri
 OPENAI_API_KEY=your_openai_key
+JWT_SECRET=your_jwt_secret
 STRIPE_SECRET_KEY=your_stripe_secret
 IMAGEKIT_PUBLIC_KEY=your_imagekit_publicKey
 IMAGEKIT_PRIVATE_KEY=your_imagekit_privateKey
 IMAGEKIT_URL_ENDPOINT=your_imagekit_endpoint
 ```
 
-**Client `.env`**
+**Client `.env`** (in `client/` folder) — Vite uses `VITE_` prefix
 
 ```env
-REACT_APP_API_URL=http://localhost:5000
+VITE_SERVER_URL=http://localhost:8000
 ```
 
-4. **Start the development servers**
+4. **Start the development servers** (use two terminals)
 
 ```bash
-# Backend
-cd ../server
-node index.js
+# Terminal 1 — Backend
+cd server
+npm run server
 
-# Frontend
-cd ../client
+# Terminal 2 — Frontend
+cd client
 npm run dev
 ```
 
-5. **Access the app**
-   [http://localhost:5173](http://localhost:5173)
+5. **Access the app**  
+   Open [http://localhost:5173](http://localhost:5173)
 
 ---
 
 ## 📝 Usage
 
-1. Sign up or log in
-2. Start a new chat with AI
-3. Enter prompts to generate text or images
-4. Explore generated images in the community gallery
-5. Purchase credits via Stripe
-6. Toggle between Dark/Light themes
-7. View chat history, delete or share images
+1. **Sign up or log in**
+2. **Choose mode** from the dropdown:
+   - **Text (ChatGPT)** — General AI chat
+   - **Image** — Generate images from prompts
+   - **Hitesh** — Chat with Hitesh Sir persona
+   - **Zakir** — Chat with Zakir persona
+3. Type your message and send
+4. Use **Community** to view shared images; **Credits** to buy more
+5. Toggle **Dark/Light** theme; view or delete chat history from the sidebar
 
 ---
 
 ## 🌐 Deployment
 
-* The app is fully deployed on **Vercel**
-* Push your code to **GitHub**
-* Connect with Vercel for automatic deployments
-* Add a **live demo link** here: [QuickGPT Live](https://your-vercel-deployment.vercel.app)
+- **Frontend:** Deploy `client/` to Vercel (build command: `npm run build`, output: `dist`)
+- **Backend:** Deploy `server/` to Vercel (Node.js); ensure `vercel.json` and `server.js` export the app
+- Set **VITE_SERVER_URL** in frontend env to your backend URL (e.g. `https://quick-gpt-backend-ten.vercel.app`)
+- Live demo: [QuickGPT Frontend](https://quick-gpt-frontend-xi.vercel.app)
 
 ---
 
@@ -145,6 +149,4 @@ For queries or contributions, reach out via **shivanipandey0107@gmail.com**
 ---
 
 **Made with ❤️ and AI magic!**
-
-```
 
