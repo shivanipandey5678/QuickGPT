@@ -65,14 +65,23 @@ const Chatbox = () => {
       const apiMode = isImage ? "image" : "text";
       const persona = mode === "hitesh" ? "hitesh" : mode === "zakir" ? "zakir" : null;
 
+      const payload = {
+        chatId: selectedChat._id,
+        prompt: String(prompt),
+        isPublished: !!isPublished,
+        ...(persona && { persona }),
+      };
+
       const { data } = await axios.post(
         `/api/message/${apiMode}`,
-        { chatId: selectedChat._id, prompt, isPublished, persona },
+        payload,
         {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
+          // Force body to be sent as JSON string so it always reaches backend
+          transformRequest: [(body) => JSON.stringify(body)],
         }
       );
       if (data.success) {

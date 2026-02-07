@@ -55,9 +55,13 @@ export const textMessageController = async (req, res) => {
     await User.updateOne({ _id: userId }, { $inc: { credit: -1 } });
     return res.json({ success: true, reply });
   } catch (error) {
-    res.json({
+    const is429 = error.status === 429 || (error.message && String(error.message).includes("429"));
+    const message = is429
+      ? "AI rate limit reached. Please wait a minute and try again, or check your API quota."
+      : "Something went wrong";
+    res.status(is429 ? 429 : 500).json({
       success: false,
-      message: "Something went wrong",
+      message,
       error: error.message,
     });
   }
@@ -109,10 +113,13 @@ export const imageMessageController = async (req, res) => {
       await User.updateOne({ _id: userId }, { $inc: { credit: -2 } });
       res.json({success:true, reply})
   } catch (error) {
-
-    res.json({
+    const is429 = error.status === 429 || (error.response && error.response.status === 429) || (error.message && String(error.message).includes("429"));
+    const message = is429
+      ? "AI rate limit reached. Please wait a minute and try again, or check your API quota."
+      : "Something went wrong";
+    res.status(is429 ? 429 : 500).json({
       success: false,
-      message: "Something went wrong",
+      message,
       error: error.message,
     });
   }

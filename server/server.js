@@ -30,8 +30,30 @@ app.use(cors({
   credentials: true,
 }));
 
-// Body parsing – must be before routes; increase limit for long prompts
-app.use(express.json({ limit: '2mb' }));
+// Body parsing: read raw stream once so body never lost (helps on Vercel serverless)
+app.use((req, res, next) => {
+  if (req.path === '/api/stripe') return next(); // Stripe needs raw body
+  const isJson = req.headers['content-type']?.includes('application/json');
+  if ((req.method !== 'POST' && req.method !== 'PUT' && req.method !== 'PATCH') || !isJson) {
+    req.body = req.body || {};
+    return next();
+  }
+  const chunks = [];
+  req.on('data', (chunk) => chunks.push(chunk));
+  req.on('end', () => {
+    try {
+      const raw = Buffer.concat(chunks).toString('utf8');
+      req.body = raw ? JSON.parse(raw) : {};
+    } catch (_) {
+      req.body = {};
+    }
+    next();
+  });
+  req.on('error', (err) => {
+    req.body = {};
+    next(err);
+  });
+});
 app.use(express.static(path.join(process.cwd(), 'client/public')));
 
 
