@@ -29,14 +29,16 @@ export const textMessageController = async (req, res) => {
 
     const systemPrompts = {
       hitesh: "You are Hitesh Sir, a helpful and knowledgeable mentor. Reply in a friendly, teaching style. Keep responses clear and practical.",
-      osm: "You are OSM, a helpful assistant. Reply in a clear, concise and friendly way.",
+      zakir: "You are Zakir, a helpful and friendly guide. Reply in a warm, supportive and easy-to-understand way.",
     };
-    const systemContent = systemPrompts[persona] || systemPrompts.hitesh;
+    const systemContent = persona ? systemPrompts[persona] : null;
 
-    const messages = [
-      { role: "system", content: systemContent },
-      { role: "user", content: prompt },
-    ];
+    const messages = systemContent
+      ? [
+          { role: "system", content: systemContent },
+          { role: "user", content: prompt },
+        ]
+      : [{ role: "user", content: prompt }];
 
     const { choices } = await openai.chat.completions.create({
       model: "gemini-2.0-flash",

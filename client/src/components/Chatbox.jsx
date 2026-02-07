@@ -12,13 +12,14 @@ const Chatbox = () => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [prompt, setPrompt] = useState("");
-  const [mode, setMode] = useState("text");
-  const [persona, setPersona] = useState("hitesh"); // "hitesh" | "osm"
+  const [mode, setMode] = useState("text"); // "text" | "image" | "hitesh" | "zakir"
   const [isPublished, setIsPublished] = useState(false);
 
-  const personaOptions = [
-    { value: "hitesh", label: "Chat with Hitesh Sir" },
-    { value: "osm", label: "Chat with OSM" },
+  const modeOptions = [
+    { value: "text", label: "Text (ChatGPT)" },
+    { value: "image", label: "Image" },
+    { value: "hitesh", label: "Hitesh" },
+    { value: "zakir", label: "Zakir" },
   ];
 
   useEffect(() => {
@@ -40,9 +41,9 @@ const Chatbox = () => {
         );
         return;
       }
-      if (mode === "text" && user.credit < 1) {
+      if (mode !== "image" && user.credit < 1) {
         toast.error(
-          "You need at least 1 credit to send a text message. Buy more credits to continue."
+          "You need at least 1 credit to send a message. Buy more credits to continue."
         );
         return;
       }
@@ -60,8 +61,12 @@ const Chatbox = () => {
         },
       ]);
 
+      const isImage = mode === "image";
+      const apiMode = isImage ? "image" : "text";
+      const persona = mode === "hitesh" ? "hitesh" : mode === "zakir" ? "zakir" : null;
+
       const { data } = await axios.post(
-        `/api/message/${mode}`,
+        `/api/message/${apiMode}`,
         { chatId: selectedChat._id, prompt, isPublished, persona },
         {
           headers: {
@@ -72,7 +77,7 @@ const Chatbox = () => {
       );
       if (data.success) {
         setMessages((prev) => [...prev, data.reply]);
-        if (mode === "image") {
+        if (isImage) {
           setUser((prev) => ({ ...prev, credit: prev.credit - 2 }));
         } else {
           setUser((prev) => ({ ...prev, credit: prev.credit - 1 }));
@@ -132,7 +137,7 @@ const Chatbox = () => {
 
       {mode === "image" && (
         <label className="inline-flex items-center gap-2 mb-3 text-3 text-sm mx-auto">
-          <p className="text-xs">Publish Generated Image to Community </p>
+          <p className="text-xs">Publish to Community</p>
           <input
             type="checkbox"
             className="cursor-pointer"
@@ -142,53 +147,42 @@ const Chatbox = () => {
         </label>
       )}
 
-      {/* Selected persona – visible as soon as user selects */}
-      <p className="text-center text-sm text-gray-500 dark:text-purple-200/80 mb-1">
-        {persona === "hitesh" ? "Chat with Hitesh Sir" : "Chat with OSM"}
-      </p>
-
-      {/* prompt input box */}
+      {/* One dropdown: Text (ChatGPT) | Image | Hitesh | Zakir */}
       <form
         onSubmit={onSubmit}
-        className="bg-primary/20 dark:bg-[#583C79]/30 border border-primary dark:border-[#806609F]/30 rounded-full w-full max-w-2xl p-2 sm:p-3 mx-auto flex flex-col sm:flex-row gap-2 sm:gap-3 items-stretch sm:items-center justify-between min-w-0"
+        className="bg-primary/20 dark:bg-[#583C79]/30 border border-primary dark:border-[#806609F]/30 rounded-2xl w-full max-w-2xl p-2 sm:p-3 mx-auto flex gap-2 sm:gap-3 items-center min-w-0"
       >
-        <div className="w-full flex flex-wrap gap-2 sm:gap-3 min-w-0 items-center">
-          <select
-            className="text-xs sm:text-sm outline-none rounded-lg px-2 py-1.5 border border-primary/50 dark:border-white/20 bg-white/50 dark:bg-white/10 shrink-0"
-            onChange={(e) => setPersona(e.target.value)}
-            value={persona}
-            title="Choose who to chat with"
-          >
-            {personaOptions.map((opt) => (
-              <option key={opt.value} value={opt.value} className="dark:bg-purple-900">
-                {opt.label}
-              </option>
-            ))}
-          </select>
-          <select
-            className="text-xs sm:text-sm outline-none rounded-lg px-2 py-1.5 border border-primary/50 dark:border-white/20 bg-white/50 dark:bg-white/10 shrink-0"
-            onChange={(e) => setMode(e.target.value)}
-            value={mode}
-          >
-            <option value="text" className="dark:bg-purple-900">Text</option>
-            <option value="image" className="dark:bg-purple-900">Image</option>
-          </select>
-          <input
-            type="text"
-            placeholder="Type your prompt here ..."
-            onChange={(e) => setPrompt(e.target.value)}
-            value={prompt}
-            className="outline-none flex-1 min-w-0"
-          />
-        </div>
+        <select
+          className="text-xs sm:text-sm outline-none rounded-xl px-2 sm:px-3 py-2 border border-primary/50 dark:border-white/20 bg-white/80 dark:bg-white/10 shrink-0 w-[130px] sm:w-[140px]"
+          onChange={(e) => setMode(e.target.value)}
+          value={mode}
+          title="Text=ChatGPT, Image=generate, Hitesh/Zakir=chat with them"
+          aria-label="Chat mode"
+        >
+          {modeOptions.map((opt) => (
+            <option key={opt.value} value={opt.value} className="dark:bg-purple-900">
+              {opt.label}
+            </option>
+          ))}
+        </select>
+        <input
+          type="text"
+          placeholder="Type your message..."
+          onChange={(e) => setPrompt(e.target.value)}
+          value={prompt}
+          className="outline-none flex-1 min-w-0 py-2 px-3 rounded-xl bg-transparent placeholder:text-gray-500 dark:placeholder:text-purple-200/60"
+          aria-label="Message"
+        />
         <button
+          type="submit"
           disabled={loading}
-          className="pr-2 cursor-pointer"
-          onSubmit={onSubmit}
+          className="shrink-0 p-2 rounded-full hover:opacity-80 transition-opacity disabled:opacity-50"
+          aria-label="Send"
         >
           <img
             src={loading ? assets.stop_icon : assets.send_icon}
-            alt="send_icon"
+            alt=""
+            className="w-5 h-5 sm:w-6 sm:h-6"
           />
         </button>
       </form>
