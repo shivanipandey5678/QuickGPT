@@ -2,17 +2,16 @@
 
 # QuickGPT 🚀
 
-A **Full-Stack AI Chatbot Application** built with **React.js, Node.js, Express, MongoDB**, powered by **OpenAI / Gemini API**. QuickGPT lets you chat with AI (ChatGPT-style), talk to **Hitesh** or **Zakir** personas, generate images, manage credits, and explore a community gallery — all in a responsive interface.
+A **Full-Stack AI Chatbot Application** built with **React.js, Node.js, Express, MongoDB**, powered by **OpenAI** (and optionally **Google Gemini**). QuickGPT lets you chat with AI (text) and generate images (OpenAI DALL·E 2), manage credits, and explore a community gallery — all in a responsive interface.
 
 ---
 
 ## 🌟 Key Features
 
-- **User Authentication:** Sign up & log in securely  
-- **4-in-1 Chat Mode:** One dropdown — **Text (ChatGPT)** | **Image** | **Hitesh** | **Zakir**
-- **Real-time AI Chat:** Text with general ChatGPT or persona-based (Hitesh Sir / Zakir)
-- **AI Image Generation:** Create images from prompts (Image mode)
-- **Credit System:** Credits for text (1) and image (2); purchase via Stripe
+- **User Authentication:** Sign up & log in securely (JWT)
+- **Text Chat:** AI chat via OpenAI (GPT) or Gemini — one dropdown: **Text (ChatGPT)** | **Image**
+- **AI Image Generation:** Create images from prompts using **OpenAI DALL·E 2**, stored on ImageKit
+- **Credit System:** 1 credit per text message, 2 per image; purchase via Stripe
 - **Community Gallery:** View and share AI-generated images
 - **Theme Toggle:** Dark/Light mode
 - **Responsive Design:** Mobile and desktop friendly
@@ -35,12 +34,12 @@ A **Full-Stack AI Chatbot Application** built with **React.js, Node.js, Express,
 
 ## 🛠️ Tech Stack
 
-**Frontend:** React.js, Tailwind CSS, React Router, Moment.js  
+**Frontend:** React, Vite, Tailwind CSS, React Router, Axios, React Hot Toast  
 **Backend:** Node.js, Express.js  
-**Database:** MongoDB  
-**AI Models:** OpenAI / Google Gemini API  
-**Image Management:** ImageKit  
-**Payments:** Stripe  
+**Database:** MongoDB (Mongoose)  
+**AI:** OpenAI (chat: GPT-3.5-turbo, image: DALL·E 2) — or Gemini for chat if no OpenAI key  
+**Image Storage:** ImageKit (upload generated images)  
+**Payments:** Stripe (Checkout + Webhooks)  
 **Deployment:** Vercel  
 
 
@@ -51,10 +50,10 @@ A **Full-Stack AI Chatbot Application** built with **React.js, Node.js, Express,
 
 - Node.js installed  
 - npm or yarn  
-- MongoDB account (Atlas) or local setup  
-- Stripe API keys  
-- OpenAI API credentials  
-- ImageKit account  
+- MongoDB (Atlas or local)  
+- **OpenAI API key** (for chat + image; or **Gemini API key** for chat only)  
+- Stripe API keys (secret + webhook secret)  
+- ImageKit account (for storing generated images)  
 
 ### Setup
 
@@ -62,7 +61,7 @@ A **Full-Stack AI Chatbot Application** built with **React.js, Node.js, Express,
 ```bash
 git clone <your_repo_url>
 cd <project_directory>
-````
+```
 
 2. **Install dependencies**
 
@@ -83,12 +82,18 @@ npm install
 ```env
 MONGO_URI=your_mongodb_uri
 OPENAI_API_KEY=your_openai_key
+# Optional: use Gemini for chat if OPENAI_API_KEY not set
+# GEMINI_API_KEY=your_gemini_key
 JWT_SECRET=your_jwt_secret
 STRIPE_SECRET_KEY=your_stripe_secret
-IMAGEKIT_PUBLIC_KEY=your_imagekit_publicKey
-IMAGEKIT_PRIVATE_KEY=your_imagekit_privateKey
-IMAGEKIT_URL_ENDPOINT=your_imagekit_endpoint
+STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
+IMAGEKIT_PUBLIC_KEY=your_imagekit_public_key
+IMAGEKIT_PRIVATE_KEY=your_imagekit_private_key
+IMAGEKIT_URL_ENDPOINT=your_imagekit_url_endpoint
 ```
+
+- **OpenAI key** → used for both text chat and image generation (DALL·E 2).  
+- If you only set **GEMINI_API_KEY**, text chat uses Gemini; **image generation will ask for OpenAI key**.
 
 **Client `.env`** (in `client/` folder) — Vite uses `VITE_` prefix
 
@@ -117,10 +122,8 @@ npm run dev
 
 1. **Sign up or log in**
 2. **Choose mode** from the dropdown:
-   - **Text (ChatGPT)** — General AI chat
-   - **Image** — Generate images from prompts
-   - **Hitesh** — Chat with Hitesh Sir persona
-   - **Zakir** — Chat with Zakir persona
+   - **Text (ChatGPT)** — AI text chat (OpenAI or Gemini)
+   - **Image** — Generate images from prompts (OpenAI DALL·E 2, stored on ImageKit)
 3. Type your message and send
 4. Use **Community** to view shared images; **Credits** to buy more
 5. Toggle **Dark/Light** theme; view or delete chat history from the sidebar
