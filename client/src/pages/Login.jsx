@@ -13,31 +13,29 @@ const Login = () => {
      try {
         if(state==="login"){
             const res= await axios.post('/api/user/login',{email,password});
-            console.log("API Response login:", res.data);
             if (res.data.success) {
-                    toast.success(res.data.message || "Chat loggedIn successfully!");
+                    toast.success(res.data.message || "Logged in successfully!");
                     setUser(res.data.user)
                     setToken(res.data.token)
                     localStorage.setItem("token", res.data.token);
             } else {
-                    toast.error("Failed to login chat!");
+                    toast.error(res.data.message || "Failed to login!");
             }
         }else{
             const res= await axios.post('/api/user/register',{name,email,password});
-            console.log("API Response register:", res);
             if (res.data.success) {
-                toast.success(res.data.message || "Chat register successfully!");
+                toast.success(res.data.message || "Registered successfully!");
                 setUser(res.data.user)
                 setToken(res.data.token)
                 localStorage.setItem("token", res.data.token);
             } else {
-                    toast.error("Failed to register chat!");
+                toast.error(res.data.message || "Failed to register!");
             }
         }
         
      } catch (error) {
-        console.error("Error login.jsx chats:", error);
-        toast.error("Something went wrong while login chats!");
+        const msg = error.response?.data?.message || error.message || "Something went wrong. Try again.";
+        toast.error(msg);
      }
     
     

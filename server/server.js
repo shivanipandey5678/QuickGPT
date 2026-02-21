@@ -70,10 +70,7 @@ app.use('/api/message',messageRouter)
 app.use('/api/credits',creditRouter)
 
 //health-check route
-app.get('/',(req,res)=> {
-    console.log("well - health...")
-    res.send("well - health...")
-})
+app.get('/', (req, res) => res.send("well - health..."))
 
 app.use((req, res) => {
     res.status(404).send('Not Found');

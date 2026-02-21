@@ -32,7 +32,7 @@ export const getPlans = async(req,res) => {
     }
 }
 
-const stripe = new Stripe(process.env.STRIPE_SECREAT_KEY)
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 //API Controller for purchasing a plan
 
 export const purchasePlans = async(req,res) =>{

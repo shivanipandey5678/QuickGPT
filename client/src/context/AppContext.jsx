@@ -11,7 +11,7 @@ export const AppContextProvider = ({ children }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [chats, setChats] = useState([]);
-  const [selectedChat, setSelectedChat] = useState({});
+  const [selectedChat, setSelectedChat] = useState(null);
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
   const [token, setToken] = useState(localStorage.getItem("token") || null);
   const [loadingChats, setLoadingChats] = useState(true);
@@ -27,10 +27,19 @@ export const AppContextProvider = ({ children }) => {
       if (data.success) {
         setUser(data.user);
       } else {
-        toast.error(data.message," else fetchUser appcontext");
+        toast.error(data.message, " else fetchUser appcontext");
       }
     } catch (error) {
-      toast.error(error.message ," catch fetchUser appcontext");
+      const status = error.response?.status;
+      const msg = error.response?.data?.error || error.message || "";
+      if (status === 401 || msg.toLowerCase().includes("jwt expired") || msg.toLowerCase().includes("unauthorized")) {
+        localStorage.removeItem("token");
+        setToken(null);
+        setUser(null);
+        toast.error("Session expired. Please login again.");
+      } else {
+        toast.error(error.message, " catch fetchUser appcontext");
+      }
     } finally {
       setLoadingUser(false);
     }
@@ -54,24 +63,20 @@ export const AppContextProvider = ({ children }) => {
       const { data } = await axios.get("/api/chat/all-chats", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log("fetchUsersChats get at appcontext.jsx 📞📞", data);
       if (data.success) {
         setChats([...data.chats]);
-        console.log("chats ata  fetchUsersChats🟢🟢", data);
         if (data.chats.length === 0) {
           await createNewChat();
-
           return fetchUsersChats();
         } else {
           const firstChat = data.chats[0];
           setSelectedChat(firstChat);
-          console.log(firstChat, "😎");
         }
       } else {
-        toast.error(data.message ," catch fetchUsersChats appcontext");
+        toast.error(data.message, " fetchUsersChats");
       }
     } catch (error) {
-      toast.error(error.message ," catch fetchUsersChats appcontext");
+      toast.error(error.message, " fetchUsersChats");
     }
   };
 
@@ -88,7 +93,6 @@ export const AppContextProvider = ({ children }) => {
 
   useEffect(() => {
     if (user) {
-      console.log(user, "⏳⏳⏳");
       fetchUsersChats();
     } else {
       setChats([]);

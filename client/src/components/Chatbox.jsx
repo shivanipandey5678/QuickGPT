@@ -12,22 +12,17 @@ const Chatbox = () => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [prompt, setPrompt] = useState("");
-  const [mode, setMode] = useState("text"); // "text" | "image" | "hitesh" | "zakir"
+  const [mode, setMode] = useState("text"); // "text" | "image"
   const [isPublished, setIsPublished] = useState(false);
 
   const modeOptions = [
     { value: "text", label: "Text (ChatGPT)" },
     { value: "image", label: "Image" },
-    { value: "hitesh", label: "Hitesh" },
-    { value: "zakir", label: "Zakir" },
   ];
 
   useEffect(() => {
-    if (selectedChat) {
-      setMessages(selectedChat.message);
-    } else {
-      setMessages([]);
-    }
+    const list = selectedChat?.message;
+    setMessages(Array.isArray(list) ? list : []);
   }, [selectedChat]);
 
   const onSubmit = async (e) => {
@@ -63,13 +58,10 @@ const Chatbox = () => {
 
       const isImage = mode === "image";
       const apiMode = isImage ? "image" : "text";
-      const persona = mode === "hitesh" ? "hitesh" : mode === "zakir" ? "zakir" : null;
-
       const payload = {
         chatId: selectedChat._id,
         prompt: String(prompt),
         isPublished: !!isPublished,
-        ...(persona && { persona }),
       };
 
       const { data } = await axios.post(
@@ -91,14 +83,16 @@ const Chatbox = () => {
         } else {
           setUser((prev) => ({ ...prev, credit: prev.credit - 1 }));
         }
+        setPrompt("");
       } else {
-        toast.error(data.message, " catch onSubmit chatbox");
+        toast.error(data.message);
         setPrompt(promptCopy);
       }
     } catch (error) {
-      toast.error(error.message, " catch onSubmit chatbox");
+      const msg = error.response?.data?.message || error.message || "Something went wrong.";
+      toast.error(msg);
+      setPrompt(promptCopy);
     } finally {
-      setPrompt("");
       setLoading(false);
     }
   };
@@ -117,7 +111,7 @@ const Chatbox = () => {
 
       <div className="flex-1 mb-5 overflow-y-scroll" ref={containerRef}>
     
-        {messages.length === 0 && (
+        {(!messages || messages.length === 0) && (
           <div className="h-full flex flex-col items-center justify-center gap-2 text-primary">
             <img
               src={theme === "dark" ? assets.logo_full : assets.logo_full_dark}
@@ -130,7 +124,7 @@ const Chatbox = () => {
           </div>
         )}
 
-        {messages.map((message, i) => (
+        {(messages || []).map((message, i) => (
           <Message key={i} message={message} />
         ))}
 

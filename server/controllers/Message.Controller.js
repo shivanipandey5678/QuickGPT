@@ -1,9 +1,8 @@
 //text based ai chat message
 import Chat from "../models/Chat.Model.js";
 import User from "../models/User.js";
-import axios from 'axios';
 import imagekit from "../config/imageKit.js";
-import { openai } from "../config/openai.js";
+import { openai, CHAT_MODEL } from "../config/openai.js";
 
 
 
@@ -17,7 +16,9 @@ export const textMessageController = async (req, res) => {
           });
         }
     const body = req.body || {};
-    const { chatId, prompt, persona } = body;
+    const { chatId, prompt, persona: personaRaw } = body;
+    const persona = typeof personaRaw === "string" ? personaRaw.toLowerCase().trim() : null;
+
     if (!chatId || prompt === undefined || prompt === null) {
       return res.status(400).json({
         success: false,
@@ -28,10 +29,10 @@ export const textMessageController = async (req, res) => {
     chat.message.push({ role: "user", content: prompt, timestamp: Date.now() });
 
     const systemPrompts = {
-      hitesh: "You are Hitesh Sir, a helpful and knowledgeable mentor. Reply in a friendly, teaching style. Keep responses clear and practical.",
-      zakir: "You are Zakir, a helpful and friendly guide. Reply in a warm, supportive and easy-to-understand way.",
+      hitesh: "You are Hitesh Sir, a helpful and knowledgeable mentor. You must always reply in character as Hitesh Sir: friendly, teaching style, clear and practical. Sign off or hint that you are Hitesh when appropriate.",
+      zakir: "You are Zakir, a helpful and friendly guide. You must always reply in character as Zakir: warm, supportive, easy-to-understand. Sign off or hint that you are Zakir when appropriate.",
     };
-    const systemContent = persona ? systemPrompts[persona] : null;
+    const systemContent = persona && systemPrompts[persona] ? systemPrompts[persona] : (persona ? `You are ${persona}, a helpful and friendly assistant. Reply in a warm, clear way.` : null);
 
     const messages = systemContent
       ? [
@@ -41,7 +42,7 @@ export const textMessageController = async (req, res) => {
       : [{ role: "user", content: prompt }];
 
     const { choices } = await openai.chat.completions.create({
-      model: "gemini-2.0-flash",
+      model: CHAT_MODEL,
       messages,
     });
 
@@ -69,9 +70,15 @@ export const textMessageController = async (req, res) => {
 
 
 
-//image generation messages
+//image generation via OpenAI DALL-E, then upload to ImageKit
 export const imageMessageController = async (req, res) => {
   try {
+    if (!process.env.OPENAI_API_KEY) {
+      return res.status(400).json({
+        success: false,
+        message: "Image generation requires OpenAI API key. Add OPENAI_API_KEY in server .env",
+      });
+    }
     const userId = req.user._id;
     if (req.user.credit < 2) {
       return res.json({
@@ -79,26 +86,33 @@ export const imageMessageController = async (req, res) => {
         message: "You don't have enough credits to use this feature",
       });
     }
- 
+
     const { prompt, chatId, isPublished } = req.body;
     const chat = await Chat.findOne({ _id: chatId, userId });
     chat.message.push({ role: "user", content: prompt, timestamp: Date.now() });
 
-    //encode prompt
-    const encodedPrompt = encodeURIComponent(prompt)
+    const imageResponse = await openai.images.generate({
+      model: "dall-e-2",
+      prompt: String(prompt),
+      n: 1,
+      size: "512x512",
+      response_format: "b64_json",
+    });
 
-    const generatedImageUrl = `${process.env.IMAGEKIT_URL_ENDPOINT}/ik-genimg-prompt-${encodedPrompt}/quickgpt/${Date.now()}.png?tr=w-800,h-800`;
-    
-    const aiImageResponse = await axios.get(generatedImageUrl,{responseType:'arraybuffer'})
+    const b64 = imageResponse.data?.[0]?.b64_json;
+    if (!b64) {
+      return res.status(500).json({
+        success: false,
+        message: "Image generation failed. No image data returned.",
+      });
+    }
 
-    //convert to base64
-    const base64Image = `data:image/png;base64,${Buffer.from(aiImageResponse.data,"binary").toString('base64')}`
-
+    const base64Image = `data:image/png;base64,${b64}`;
     const uploadResponse = await imagekit.upload({
-        file: base64Image,
-        fileName:`${Date.now()}.png`,
-        folder:'quickgpt'
-    })
+      file: base64Image,
+      fileName: `${Date.now()}.png`,
+      folder: "quickgpt",
+    });
 
     const reply = {
         role:'assistant',
