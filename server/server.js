@@ -1,90 +1,156 @@
-import "dotenv/config";  
+import "dotenv/config";
 
-import express from 'express';
-import cors from 'cors';
-import connectDB from './config/db.js';
-import UserRouter from './router/User.Routes.js';
-import ChatRouter from './router/Chat.Route.js';
+import express from "express";
+import cors from "cors";
+import path from "path";
+
+import connectDB from "./config/db.js";
+
+import UserRouter from "./router/User.Routes.js";
+import ChatRouter from "./router/Chat.Route.js";
 import messageRouter from "./router/Message.Route.js";
 import creditRouter from "./router/Credits.Route.js";
+
 import { stripeWebhooks } from "./controllers/webHook.Controller.js";
-import path from 'path';
 
 const app = express();
 
-// CORS: allow frontend origin and required headers (fixes OPTIONS + POST body on Vercel)
+
+// ================= CORS =================
+
 const allowedOrigins = [
-  'https://quick-gpt-frontend-xi.vercel.app',
-  'http://localhost:5173',
-  'http://localhost:3000',
-  /\.vercel\.app$/
+  "https://quick-gpt-frontend-xi.vercel.app",
+  "http://localhost:5173",
+  "http://localhost:3000",
 ];
-app.use(cors({
-  origin: (origin, cb) => {
-    if (!origin) return cb(null, true); // same-origin or Postman
-    if (allowedOrigins.some(o => typeof o === 'string' ? o === origin : o.test(origin))) return cb(null, true);
-    return cb(null, false);
-  },
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-}));
 
-// Body parsing: read raw stream once so body never lost (helps on Vercel serverless)
-app.use((req, res, next) => {
-  if (req.path === '/api/stripe') return next(); // Stripe needs raw body
-  const isJson = req.headers['content-type']?.includes('application/json');
-  if ((req.method !== 'POST' && req.method !== 'PUT' && req.method !== 'PATCH') || !isJson) {
-    req.body = req.body || {};
-    return next();
-  }
-  const chunks = [];
-  req.on('data', (chunk) => chunks.push(chunk));
-  req.on('end', () => {
-    try {
-      const raw = Buffer.concat(chunks).toString('utf8');
-      req.body = raw ? JSON.parse(raw) : {};
-    } catch (_) {
-      req.body = {};
-    }
-    next();
-  });
-  req.on('error', (err) => {
-    req.body = {};
-    next(err);
-  });
-});
-app.use(express.static(path.join(process.cwd(), 'client/public')));
+app.use(
+  cors({
+    origin: function (origin, callback) {
+
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
+
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+    ],
+  })
+);
+
+app.options("*", cors());
 
 
-//connecting to db
+// ================= BODY PARSER =================
+
+app.use(express.json());
+
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
+
+
+// ================= STATIC =================
+
+app.use(
+  express.static(
+    path.join(process.cwd(), "client/public")
+  )
+);
+
+
+// ================= DB =================
+
 await connectDB();
 
-//Stripe webhooks
-app.post('/api/stripe',express.raw({type:'application/json'}),stripeWebhooks)
 
-//routes
-app.use('/api/user',UserRouter)
-app.use('/api/chat',ChatRouter)
-app.use('/api/message',messageRouter)
-app.use('/api/credits',creditRouter)
+// ================= STRIPE =================
 
-//health-check route
-app.get('/', (req, res) => res.send("well - health..."))
+app.post(
+  "/api/stripe",
+  express.raw({ type: "application/json" }),
+  stripeWebhooks
+);
 
-app.use((req, res) => {
-    res.status(404).send('Not Found');
+
+// ================= ROUTES =================
+
+app.use("/api/user", UserRouter);
+
+app.use("/api/chat", ChatRouter);
+
+app.use("/api/message", messageRouter);
+
+app.use("/api/credits", creditRouter);
+
+
+// ================= HEALTH =================
+
+app.get("/", (req, res) => {
+  res.send("well - health...");
 });
 
-app.get('/favicon.ico', (req, res) => {
-    res.sendFile(path.join(process.cwd(), 'client/public', 'favicon.ico'));
-  });
-  
 
-// Local server (Vercel uses the exported app)
+// ================= FAVICON =================
+
+app.get("/favicon.ico", (req, res) => {
+  res.sendFile(
+    path.join(
+      process.cwd(),
+      "client/public",
+      "favicon.ico"
+    )
+  );
+});
+
+
+// ================= 404 =================
+
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route Not Found",
+  });
+});
+
+
+// ================= ERROR =================
+
+app.use((err, req, res, next) => {
+
+  console.log(err);
+
+  res.status(500).json({
+    success: false,
+    message: err.message || "Server Error",
+  });
+});
+
+
+// ================= LOCAL SERVER =================
+
 const PORT = process.env.PORT || 8000;
-if (process.env.NODE_ENV !== 'production' || process.env.VERCEL !== '1') {
-  app.listen(PORT, () => console.log('Server is live on', PORT));
+
+if (
+  process.env.NODE_ENV !== "production" ||
+  process.env.VERCEL !== "1"
+) {
+  app.listen(PORT, () => {
+    console.log(`Server live on ${PORT}`);
+  });
 }
 
 export default app;
